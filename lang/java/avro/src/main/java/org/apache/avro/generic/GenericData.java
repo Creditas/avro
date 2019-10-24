@@ -564,61 +564,61 @@ public class GenericData {
    */
   public boolean validate(Schema schema, Object datum) {
     switch (schema.getType()) {
-      case RECORD:
-        if (!isRecord(datum))
-          return false;
-        for (Field f : schema.getFields()) {
-          if (!validate(f.schema(), getField(datum, f.name(), f.pos())))
-            return false;
-        }
-        return true;
-      case ENUM:
-        if (!isEnum(datum))
-          return false;
-        return schema.getEnumSymbols().contains(datum.toString());
-      case ARRAY:
-        if (!(isArray(datum)))
-          return false;
-        for (Object element : getArrayAsCollection(datum))
-          if (!validate(schema.getElementType(), element))
-            return false;
-        return true;
-      case MAP:
-        if (!(isMap(datum)))
-          return false;
-        @SuppressWarnings(value = "unchecked")
-        Map<Object, Object> map = (Map<Object, Object>) datum;
-        for (Map.Entry<Object, Object> entry : map.entrySet())
-          if (!validate(schema.getValueType(), entry.getValue()))
-            return false;
-        return true;
-      case UNION:
-        try {
-          int i = resolveUnion(schema, datum);
-          return validate(schema.getTypes().get(i), datum);
-        } catch (UnresolvedUnionException e) {
-          return false;
-        }
-      case FIXED:
-        return datum instanceof GenericFixed && ((GenericFixed) datum).bytes().length == schema.getFixedSize();
-      case STRING:
-        return isString(datum);
-      case BYTES:
-        return isBytes(datum);
-      case INT:
-        return isInteger(datum);
-      case LONG:
-        return isLong(datum);
-      case FLOAT:
-        return isFloat(datum);
-      case DOUBLE:
-        return isDouble(datum);
-      case BOOLEAN:
-        return isBoolean(datum);
-      case NULL:
-        return datum == null;
-      default:
+    case RECORD:
+      if (!isRecord(datum))
         return false;
+      for (Field f : schema.getFields()) {
+        if (!validate(f.schema(), getField(datum, f.name(), f.pos())))
+          return false;
+      }
+      return true;
+    case ENUM:
+      if (!isEnum(datum))
+        return false;
+      return schema.getEnumSymbols().contains(datum.toString());
+    case ARRAY:
+      if (!(isArray(datum)))
+        return false;
+      for (Object element : getArrayAsCollection(datum))
+        if (!validate(schema.getElementType(), element))
+          return false;
+      return true;
+    case MAP:
+      if (!(isMap(datum)))
+        return false;
+      @SuppressWarnings(value = "unchecked")
+      Map<Object, Object> map = (Map<Object, Object>) datum;
+      for (Map.Entry<Object, Object> entry : map.entrySet())
+        if (!validate(schema.getValueType(), entry.getValue()))
+          return false;
+      return true;
+    case UNION:
+      try {
+        int i = resolveUnion(schema, datum);
+        return validate(schema.getTypes().get(i), datum);
+      } catch (UnresolvedUnionException e) {
+        return false;
+      }
+    case FIXED:
+      return datum instanceof GenericFixed && ((GenericFixed) datum).bytes().length == schema.getFixedSize();
+    case STRING:
+      return isString(datum);
+    case BYTES:
+      return isBytes(datum);
+    case INT:
+      return isInteger(datum);
+    case LONG:
+      return isLong(datum);
+    case FLOAT:
+      return isFloat(datum);
+    case DOUBLE:
+      return isDouble(datum);
+    case BOOLEAN:
+      return isBoolean(datum);
+    case NULL:
+      return datum == null;
+    default:
+      return false;
     }
   }
 
@@ -702,8 +702,8 @@ public class GenericData {
       writeEscapedString(StandardCharsets.ISO_8859_1.decode(bytes), buffer);
       buffer.append("\"");
     } else if (((datum instanceof Float) && // quote Nan & Infinity
-      (((Float) datum).isInfinite() || ((Float) datum).isNaN()))
-      || ((datum instanceof Double) && (((Double) datum).isInfinite() || ((Double) datum).isNaN()))) {
+        (((Float) datum).isInfinite() || ((Float) datum).isNaN()))
+        || ((datum instanceof Double) && (((Double) datum).isInfinite() || ((Double) datum).isNaN()))) {
       buffer.append("\"");
       buffer.append(datum);
       buffer.append("\"");
@@ -725,39 +725,39 @@ public class GenericData {
     for (int i = 0; i < string.length(); i++) {
       char ch = string.charAt(i);
       switch (ch) {
-        case '"':
-          builder.append("\\\"");
-          break;
-        case '\\':
-          builder.append("\\\\");
-          break;
-        case '\b':
-          builder.append("\\b");
-          break;
-        case '\f':
-          builder.append("\\f");
-          break;
-        case '\n':
-          builder.append("\\n");
-          break;
-        case '\r':
-          builder.append("\\r");
-          break;
-        case '\t':
-          builder.append("\\t");
-          break;
-        default:
-          // Reference: https://www.unicode.org/versions/Unicode5.1.0/
-          if ((ch >= '\u0000' && ch <= '\u001F') || (ch >= '\u007F' && ch <= '\u009F')
+      case '"':
+        builder.append("\\\"");
+        break;
+      case '\\':
+        builder.append("\\\\");
+        break;
+      case '\b':
+        builder.append("\\b");
+        break;
+      case '\f':
+        builder.append("\\f");
+        break;
+      case '\n':
+        builder.append("\\n");
+        break;
+      case '\r':
+        builder.append("\\r");
+        break;
+      case '\t':
+        builder.append("\\t");
+        break;
+      default:
+        // Reference: https://www.unicode.org/versions/Unicode5.1.0/
+        if ((ch >= '\u0000' && ch <= '\u001F') || (ch >= '\u007F' && ch <= '\u009F')
             || (ch >= '\u2000' && ch <= '\u20FF')) {
-            String hex = Integer.toHexString(ch);
-            builder.append("\\u");
-            for (int j = 0; j < 4 - hex.length(); j++)
-              builder.append('0');
-            builder.append(hex.toUpperCase());
-          } else {
-            builder.append(ch);
-          }
+          String hex = Integer.toHexString(ch);
+          builder.append("\\u");
+          for (int j = 0; j < 4 - hex.length(); j++)
+            builder.append('0');
+          builder.append(hex.toUpperCase());
+        } else {
+          builder.append(ch);
+        }
       }
     }
   }
@@ -872,15 +872,10 @@ public class GenericData {
 
     if (datum != null) {
       Map<String, Conversion<?>> conversions = conversionsByClass.get(datum.getClass());
+      List<Schema> candidates = union.getTypes();
       if (conversions != null) {
-        List<Schema> candidates = union.getTypes();
         for (int i = 0; i < candidates.size(); i += 1) {
-          if (candidates.get(i).getType() == RECORD) {
-            if (validate(candidates.get(i), datum)) {
-              return i;
-            }
 
-          }
           LogicalType candidateType = candidates.get(i).getLogicalType();
 
           if (candidateType != null) {
@@ -889,8 +884,15 @@ public class GenericData {
               return i;
             }
           }
+        }}
+      for (int i = 0; i < candidates.size(); i += 1) {
+
+        if (candidates.get(i).getType() == RECORD) {
+          if (validate(candidates.get(i), datum)) {
+            return i;
+          }
+
         }
-      }
     }
 
     Integer i = union.getIndexNamed(getSchemaName(datum));
@@ -939,41 +941,41 @@ public class GenericData {
    */
   protected boolean instanceOf(Schema schema, Object datum) {
     switch (schema.getType()) {
-      case RECORD:
-        if (!isRecord(datum))
-          return false;
-        return (schema.getFullName() == null) ? getRecordSchema(datum).getFullName() == null
+    case RECORD:
+      if (!isRecord(datum))
+        return false;
+      return (schema.getFullName() == null) ? getRecordSchema(datum).getFullName() == null
           : schema.getFullName().equals(getRecordSchema(datum).getFullName());
-      case ENUM:
-        if (!isEnum(datum))
-          return false;
-        return schema.getFullName().equals(getEnumSchema(datum).getFullName());
-      case ARRAY:
-        return isArray(datum);
-      case MAP:
-        return isMap(datum);
-      case FIXED:
-        if (!isFixed(datum))
-          return false;
-        return schema.getFullName().equals(getFixedSchema(datum).getFullName());
-      case STRING:
-        return isString(datum);
-      case BYTES:
-        return isBytes(datum);
-      case INT:
-        return isInteger(datum);
-      case LONG:
-        return isLong(datum);
-      case FLOAT:
-        return isFloat(datum);
-      case DOUBLE:
-        return isDouble(datum);
-      case BOOLEAN:
-        return isBoolean(datum);
-      case NULL:
-        return datum == null;
-      default:
-        throw new AvroRuntimeException("Unexpected type: " + schema);
+    case ENUM:
+      if (!isEnum(datum))
+        return false;
+      return schema.getFullName().equals(getEnumSchema(datum).getFullName());
+    case ARRAY:
+      return isArray(datum);
+    case MAP:
+      return isMap(datum);
+    case FIXED:
+      if (!isFixed(datum))
+        return false;
+      return schema.getFullName().equals(getFixedSchema(datum).getFullName());
+    case STRING:
+      return isString(datum);
+    case BYTES:
+      return isBytes(datum);
+    case INT:
+      return isInteger(datum);
+    case LONG:
+      return isLong(datum);
+    case FLOAT:
+      return isFloat(datum);
+    case DOUBLE:
+      return isDouble(datum);
+    case BOOLEAN:
+      return isBoolean(datum);
+    case NULL:
+      return datum == null;
+    default:
+      throw new AvroRuntimeException("Unexpected type: " + schema);
     }
   }
 
@@ -1104,29 +1106,29 @@ public class GenericData {
       return 0; // incomplete datum
     int hashCode = 1;
     switch (s.getType()) {
-      case RECORD:
-        for (Field f : s.getFields()) {
-          if (f.order() == Field.Order.IGNORE)
-            continue;
-          hashCode = hashCodeAdd(hashCode, getField(o, f.name(), f.pos()), f.schema());
-        }
-        return hashCode;
-      case ARRAY:
-        Collection<?> a = (Collection<?>) o;
-        Schema elementType = s.getElementType();
-        for (Object e : a)
-          hashCode = hashCodeAdd(hashCode, e, elementType);
-        return hashCode;
-      case UNION:
-        return hashCode(o, s.getTypes().get(resolveUnion(s, o)));
-      case ENUM:
-        return s.getEnumOrdinal(o.toString());
-      case NULL:
-        return 0;
-      case STRING:
-        return (o instanceof Utf8 ? o : new Utf8(o.toString())).hashCode();
-      default:
-        return o.hashCode();
+    case RECORD:
+      for (Field f : s.getFields()) {
+        if (f.order() == Field.Order.IGNORE)
+          continue;
+        hashCode = hashCodeAdd(hashCode, getField(o, f.name(), f.pos()), f.schema());
+      }
+      return hashCode;
+    case ARRAY:
+      Collection<?> a = (Collection<?>) o;
+      Schema elementType = s.getElementType();
+      for (Object e : a)
+        hashCode = hashCodeAdd(hashCode, e, elementType);
+      return hashCode;
+    case UNION:
+      return hashCode(o, s.getTypes().get(resolveUnion(s, o)));
+    case ENUM:
+      return s.getEnumOrdinal(o.toString());
+    case NULL:
+      return 0;
+    case STRING:
+      return (o instanceof Utf8 ? o : new Utf8(o.toString())).hashCode();
+    default:
+      return o.hashCode();
     }
   }
 
@@ -1155,47 +1157,47 @@ public class GenericData {
     if (o1 == o2)
       return 0;
     switch (s.getType()) {
-      case RECORD:
-        for (Field f : s.getFields()) {
-          if (f.order() == Field.Order.IGNORE)
-            continue; // ignore this field
-          int pos = f.pos();
-          String name = f.name();
-          int compare = compare(getField(o1, name, pos), getField(o2, name, pos), f.schema(), equals);
-          if (compare != 0) // not equal
-            return f.order() == Field.Order.DESCENDING ? -compare : compare;
-        }
-        return 0;
-      case ENUM:
-        return s.getEnumOrdinal(o1.toString()) - s.getEnumOrdinal(o2.toString());
-      case ARRAY:
-        Collection a1 = (Collection) o1;
-        Collection a2 = (Collection) o2;
-        Iterator e1 = a1.iterator();
-        Iterator e2 = a2.iterator();
-        Schema elementType = s.getElementType();
-        while (e1.hasNext() && e2.hasNext()) {
-          int compare = compare(e1.next(), e2.next(), elementType, equals);
-          if (compare != 0)
-            return compare;
-        }
-        return e1.hasNext() ? 1 : (e2.hasNext() ? -1 : 0);
-      case MAP:
-        if (equals)
-          return o1.equals(o2) ? 0 : 1;
-        throw new AvroRuntimeException("Can't compare maps!");
-      case UNION:
-        int i1 = resolveUnion(s, o1);
-        int i2 = resolveUnion(s, o2);
-        return (i1 == i2) ? compare(o1, o2, s.getTypes().get(i1), equals) : Integer.compare(i1, i2);
-      case NULL:
-        return 0;
-      case STRING:
-        Utf8 u1 = o1 instanceof Utf8 ? (Utf8) o1 : new Utf8(o1.toString());
-        Utf8 u2 = o2 instanceof Utf8 ? (Utf8) o2 : new Utf8(o2.toString());
-        return u1.compareTo(u2);
-      default:
-        return ((Comparable) o1).compareTo(o2);
+    case RECORD:
+      for (Field f : s.getFields()) {
+        if (f.order() == Field.Order.IGNORE)
+          continue; // ignore this field
+        int pos = f.pos();
+        String name = f.name();
+        int compare = compare(getField(o1, name, pos), getField(o2, name, pos), f.schema(), equals);
+        if (compare != 0) // not equal
+          return f.order() == Field.Order.DESCENDING ? -compare : compare;
+      }
+      return 0;
+    case ENUM:
+      return s.getEnumOrdinal(o1.toString()) - s.getEnumOrdinal(o2.toString());
+    case ARRAY:
+      Collection a1 = (Collection) o1;
+      Collection a2 = (Collection) o2;
+      Iterator e1 = a1.iterator();
+      Iterator e2 = a2.iterator();
+      Schema elementType = s.getElementType();
+      while (e1.hasNext() && e2.hasNext()) {
+        int compare = compare(e1.next(), e2.next(), elementType, equals);
+        if (compare != 0)
+          return compare;
+      }
+      return e1.hasNext() ? 1 : (e2.hasNext() ? -1 : 0);
+    case MAP:
+      if (equals)
+        return o1.equals(o2) ? 0 : 1;
+      throw new AvroRuntimeException("Can't compare maps!");
+    case UNION:
+      int i1 = resolveUnion(s, o1);
+      int i2 = resolveUnion(s, o2);
+      return (i1 == i2) ? compare(o1, o2, s.getTypes().get(i1), equals) : Integer.compare(i1, i2);
+    case NULL:
+      return 0;
+    case STRING:
+      Utf8 u1 = o1 instanceof Utf8 ? (Utf8) o1 : new Utf8(o1.toString());
+      Utf8 u2 = o2 instanceof Utf8 ? (Utf8) o2 : new Utf8(o2.toString());
+      return u1.compareTo(u2);
+    default:
+      return ((Comparable) o1).compareTo(o2);
     }
   }
 
@@ -1206,15 +1208,15 @@ public class GenericData {
    *
    * @param field the field whose default value should be retrieved.
    * @return the default value associated with the given field, or null if none is
-   * specified in the schema.
+   *         specified in the schema.
    */
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings({ "unchecked" })
   public Object getDefaultValue(Field field) {
     JsonNode json = Accessor.defaultValue(field);
     if (json == null)
       throw new AvroMissingFieldException("Field " + field + " not set and has no default value", field);
     if (json.isNull() && (field.schema().getType() == Type.NULL
-      || (field.schema().getType() == Type.UNION && field.schema().getTypes().get(0).getType() == Type.NULL))) {
+        || (field.schema().getType() == Type.UNION && field.schema().getTypes().get(0).getType() == Type.NULL))) {
       return null;
     }
 
@@ -1254,7 +1256,7 @@ public class GenericData {
    * @param value  the value to deep copy.
    * @return a deep copy of the given value.
    */
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public <T> T deepCopy(Schema schema, T value) {
     if (value == null)
       return null;
@@ -1277,73 +1279,73 @@ public class GenericData {
     }
 
     switch (schema.getType()) {
-      case ARRAY:
-        List<Object> arrayValue = (List) value;
-        List<Object> arrayCopy = new GenericData.Array<>(arrayValue.size(), schema);
-        for (Object obj : arrayValue) {
-          arrayCopy.add(deepCopy(schema.getElementType(), obj));
-        }
-        return arrayCopy;
-      case BOOLEAN:
-        return value; // immutable
-      case BYTES:
-        ByteBuffer byteBufferValue = (ByteBuffer) value;
-        int start = byteBufferValue.position();
-        int length = byteBufferValue.limit() - start;
-        byte[] bytesCopy = new byte[length];
-        byteBufferValue.get(bytesCopy, 0, length);
-        byteBufferValue.position(start);
-        return ByteBuffer.wrap(bytesCopy, 0, length);
-      case DOUBLE:
-        return value; // immutable
-      case ENUM:
-        return createEnum(value.toString(), schema);
-      case FIXED:
-        return createFixed(null, ((GenericFixed) value).bytes(), schema);
-      case FLOAT:
-        return value; // immutable
-      case INT:
-        return value; // immutable
-      case LONG:
-        return value; // immutable
-      case MAP:
-        Map<CharSequence, Object> mapValue = (Map) value;
-        Map<CharSequence, Object> mapCopy = new HashMap<>(mapValue.size());
-        for (Map.Entry<CharSequence, Object> entry : mapValue.entrySet()) {
-          mapCopy.put(deepCopy(STRINGS, entry.getKey()), deepCopy(schema.getValueType(), entry.getValue()));
-        }
-        return mapCopy;
-      case NULL:
-        return null;
-      case RECORD:
-        Object oldState = getRecordState(value, schema);
-        Object newRecord = newRecord(null, schema);
-        Object newState = getRecordState(newRecord, schema);
-        for (Field f : schema.getFields()) {
-          int pos = f.pos();
-          String name = f.name();
-          Object newValue = deepCopy(f.schema(), getField(value, name, pos, oldState));
-          setField(newRecord, name, pos, newValue, newState);
-        }
-        return newRecord;
-      case STRING:
-        // Strings are immutable
-        if (value instanceof String) {
-          return value;
-        }
+    case ARRAY:
+      List<Object> arrayValue = (List) value;
+      List<Object> arrayCopy = new GenericData.Array<>(arrayValue.size(), schema);
+      for (Object obj : arrayValue) {
+        arrayCopy.add(deepCopy(schema.getElementType(), obj));
+      }
+      return arrayCopy;
+    case BOOLEAN:
+      return value; // immutable
+    case BYTES:
+      ByteBuffer byteBufferValue = (ByteBuffer) value;
+      int start = byteBufferValue.position();
+      int length = byteBufferValue.limit() - start;
+      byte[] bytesCopy = new byte[length];
+      byteBufferValue.get(bytesCopy, 0, length);
+      byteBufferValue.position(start);
+      return ByteBuffer.wrap(bytesCopy, 0, length);
+    case DOUBLE:
+      return value; // immutable
+    case ENUM:
+      return createEnum(value.toString(), schema);
+    case FIXED:
+      return createFixed(null, ((GenericFixed) value).bytes(), schema);
+    case FLOAT:
+      return value; // immutable
+    case INT:
+      return value; // immutable
+    case LONG:
+      return value; // immutable
+    case MAP:
+      Map<CharSequence, Object> mapValue = (Map) value;
+      Map<CharSequence, Object> mapCopy = new HashMap<>(mapValue.size());
+      for (Map.Entry<CharSequence, Object> entry : mapValue.entrySet()) {
+        mapCopy.put(deepCopy(STRINGS, entry.getKey()), deepCopy(schema.getValueType(), entry.getValue()));
+      }
+      return mapCopy;
+    case NULL:
+      return null;
+    case RECORD:
+      Object oldState = getRecordState(value, schema);
+      Object newRecord = newRecord(null, schema);
+      Object newState = getRecordState(newRecord, schema);
+      for (Field f : schema.getFields()) {
+        int pos = f.pos();
+        String name = f.name();
+        Object newValue = deepCopy(f.schema(), getField(value, name, pos, oldState));
+        setField(newRecord, name, pos, newValue, newState);
+      }
+      return newRecord;
+    case STRING:
+      // Strings are immutable
+      if (value instanceof String) {
+        return value;
+      }
 
-        // Some CharSequence subclasses are mutable, so we still need to make
-        // a copy
-        else if (value instanceof Utf8) {
-          // Utf8 copy constructor is more efficient than converting
-          // to string and then back to Utf8
-          return new Utf8((Utf8) value);
-        }
-        return new Utf8(value.toString());
-      case UNION:
-        return deepCopy(schema.getTypes().get(resolveUnion(schema, value)), value);
-      default:
-        throw new AvroRuntimeException("Deep copy failed for schema \"" + schema + "\" and value \"" + value + "\"");
+      // Some CharSequence subclasses are mutable, so we still need to make
+      // a copy
+      else if (value instanceof Utf8) {
+        // Utf8 copy constructor is more efficient than converting
+        // to string and then back to Utf8
+        return new Utf8((Utf8) value);
+      }
+      return new Utf8(value.toString());
+    case UNION:
+      return deepCopy(schema.getTypes().get(resolveUnion(schema, value)), value);
+    default:
+      throw new AvroRuntimeException("Deep copy failed for schema \"" + schema + "\" and value \"" + value + "\"");
     }
   }
 
